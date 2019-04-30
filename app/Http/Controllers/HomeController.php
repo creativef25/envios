@@ -32,15 +32,13 @@ class HomeController extends Controller
 
     public function envio(Request $request){
 
-      $hola = $request->json()->all();
+      $hola = $request->datos;
+      foreach ($hola as $value) {
+        $whats = new Whatsapp();
+        $whats->telefono = $value;
+        $whats->mensaje = $request->texto;
+        $whats->save();
+      }
 
-       foreach ($hola as $value) {
-         foreach ($value as $value1) {
-           $whats = new Whatsapp();
-           $whats->telefono = $value1;
-           $whats->mensaje = $request->texto;
-           $whats->save();
-         }
-       }
     }
 }

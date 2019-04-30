@@ -30,13 +30,12 @@
     <link href="{{ asset('admin/vendor/select2/select2.min.css')}}" rel="stylesheet" media="all">
     <link href="{{ asset('admin/vendor/perfect-scrollbar/perfect-scrollbar.css')}}" rel="stylesheet" media="all">
     <link href="{{ asset('admin/vendor/vector-map/jqvmap.min.css')}}" rel="stylesheet" media="all">
-    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-
-
     <!-- Main CSS-->
     <link href="{{ asset('admin/css/theme.css')}}" rel="stylesheet" media="all">
     <link href="{{ asset('admin/css/style.css')}}" rel="stylesheet">
+
+    <link href="{{ asset('admin/css/bootstrap-duallistbox.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
 </head>
 
@@ -232,48 +231,20 @@
                 <div class="container-fluid">
                   <div class="row">
                     <div class="col-md-6">
-                                <!-- DATA TABLE -->
-                                <h3 class="title-5 m-b-35" id="titulos">data table</h3>
-                                <div class="table-responsive table-responsive-data2">
-                                    <table class="table table-data2" id="usuarios">
-                                        <thead>
-                                            <tr>
-                                              <th >
-                                                  <label class="au-checkbox">
-                                                      <input type="checkbox">
-                                                      <span class="au-checkmark"></span>
-                                                  </label>
-                                              </th>
-                                              <th>Nombre</th>
-                                              <th>Telefono</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                          @foreach ($usuario as $usu)
-                                            <tr class="tr-shadow" id="{{ $usu->telefono}}">
-                                              <td>
-                                                  <label class="au-checkbox">
-                                                      <input type="checkbox" name="selector" value="">
-                                                      <span class="au-checkmark"></span>
-                                                  </label>
-                                              </td>
-                                                <td data-nombre="{{ $usu->nombre}}">{{ $usu->nombre}}</td>
-                                                <td>
-                                                    <span class="block-email">{{ $usu->telefono}}</span>
-                                                </td>
-                                            </tr>
-                                          @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- END DATA TABLE -->
-                            </div>
-                            <div class="col-md-6">
-                              <h3 class="title-5 m-b-35" id="texto" style="padding-top: 11%;">Escribe tu mensaje</h3>
-                              <textarea name="mensaje" rows="10" cols="80" id="textoArea"></textarea><br>
-                              <input class="btn btn-success btn-lg" type="button" id="enviar" value="Enviar Mensaje">
-
-                            </div>
+                      <form id="demoform">
+                        <select multiple="multiple" size="10" name="duallistbox_demo1[]" title="duallistbox_demo1[]">
+                          @foreach ($usuario as $usu)
+                            <option value="{{ $usu->telefono}}">{{ $usu->nombre}} - {{ $usu->telefono}}</option>
+                          @endforeach
+                        </select>
+                        <br>
+                        <input class="btn btn-success btn-lg btn-block" type="button" id="enviar" value="Enviar Mensaje">
+                      </form>
+                    </div>
+                    <div class="col-md-6">
+                      <h3 class="title-5 m-b-35" id="texto">Escribe tu mensaje</h3>
+                      <textarea name="mensaje" rows="10" cols="80" id="textoArea"></textarea><br>
+                    </div>
                   </div>
 
                 </div>
@@ -322,44 +293,39 @@
     <script src="{{ asset('admin/vendor/vector-map/jquery.vmap.min.js')}}"></script>
     <script src="{{ asset('admin/vendor/vector-map/jquery.vmap.sampledata.js')}}"></script>
     <script src="{{ asset('admin/vendor/vector-map/jquery.vmap.world.js')}}"></script>
-
     <!-- Main JS-->
     <script src="{{ asset('admin/js/main.js')}}"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-    <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="{{ asset('admin/js/jquery.bootstrap-duallistbox.js')}}"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script type="text/javascript">
-      $(document).ready( function(){
-        var usuarios = $('#usuarios').DataTable({
-          "pagingType": "numbers"
-        });
-
-        $('#usuarios tbody').on( 'click', 'tr', function () {
-          $(this).toggleClass('selected');
-        });
-
-        $('#enviar').on( 'click', function(){
-          var datos =  usuarios.rows('.selected').ids();
-          var texto = $('#textoArea').val();
-          axios.post('enviar/datos',{
-            datos:datos,
-            texto:texto
-          }).then(function(response){
-            //console.log(response)
-
-          }).catch(function(error){
-            alert('Proceso terminado');
-             location.reload();
-            //console.log(error);
-          });
-
-        });
-
-
+    <script>
+      var demo1 = $('select[name="duallistbox_demo1[]"]').bootstrapDualListbox({
+        infoText: 'Mostrando todos los {0}',
+        filterPlaceHolder: 'Filtros',
+        filterTextClear: 'Ver todos',
+        moveAllLabel: 'Mover todos',
+        removeAllLabel: 'Eliminar todos',
+        infoTextEmpty: 'Lista vacia',
+        btnClass: 'btn btn-outline-primary'
 
 
       });
+      $("#enviar").on('click',function() {
+        var datos = $('[name="duallistbox_demo1[]"]').val();
+        var texto = $('#textoArea').val();
+        axios.post('enviar/datos',{
+          datos:datos,
+          texto:texto
+        }).then(function(response){
+           alert('Proceso terminado');
+           location.reload();
+           //console.log(response);
+        }).catch(function(error){
+          console.log(error);
+        });
 
+      });
     </script>
 
 </body>
